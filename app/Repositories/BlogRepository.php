@@ -52,4 +52,8 @@ class BlogRepository implements BlogRepositoryInterface
         }
 
     }
+
+    public function show($slug){
+        return Blog::where('slug', $slug)->get();
+    }
 }

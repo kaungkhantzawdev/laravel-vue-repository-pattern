@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Models\Blog;
+use App\Models\Media;
 use App\Repositories\BlogRepositoryInterface;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
-    private $blogRepository;
-
-    public function __construct(BlogRepositoryInterface $blogRepository)
-    {
-        $this->blogRepository = $blogRepository;
-    }
+//    private $blogRepository;
+//
+//    public function __construct(BlogRepositoryInterface $blogRepository)
+//    {
+//        $this->blogRepository = $blogRepository;
+//    }
 
     /**
      * Display a listing of the resource.
@@ -23,18 +25,8 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = $this->blogRepository->all();
+        $blogs = Blog::latest('id')->get();
         return response()->json($blogs, 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return abort(404);
     }
 
     /**
@@ -52,7 +44,42 @@ class BlogController extends Controller
             'photos' => 'required'
         ]);
 
-        $this->blogRepository->store($request);
+        $blog = Blog::create([
+            'title'=> $request->title,
+            'slug' => Str::slug($request->title, '-'),
+            'description'=> $request->description,
+            'excerpt' => Str::limit($request->description,100, ' ...')
+        ]);
+
+        //onePhoto
+        if($request->file('image')){
+            $file= $request->file('image');
+            $filename= uniqid().'_image'.$file->getClientOriginalName();
+            $dir = "public/images";
+            $file_path =$file-> storeAs( $dir , $filename);
+
+            $image = Media::create([
+                'name' => $filename,
+                'file_type' => 101,
+                'blog_id' => $blog->id
+            ]);
+        }
+
+        //multiplePhoto
+        if($request->file('photos')){
+            foreach ($request->file('photos') as $photo){
+                $file= $photo;
+                $filename= uniqid().'_related_photo'.$photo->getClientOriginalName();
+                $dir = "public/related_photos";
+                $file-> storeAs( $dir , $filename);
+
+                $related_photos = Media::create([
+                    'name' => $filename,
+                    'file_type' => 102,
+                    'blog_id' => $blog->id
+                ]);
+            }
+        }
 
         return response()->json([
             'status' => 200,
@@ -66,9 +93,23 @@ class BlogController extends Controller
      * @param  \App\Models\Blog  $blog
      * @return \Illuminate\Http\Response
      */
-    public function show(Blog $blog)
+    public function show($slug)
     {
-        //
+        $blog = Blog::where('slug', $slug)
+            ->first();
+        if(is_null($blog)){
+            return response()->json([
+                'status' => 404,
+                'message' => "not found"
+            ], 404);
+        }else{
+            return response()->json([
+                'status' => 200,
+                'message' => "data are following",
+                'data' => $blog
+            ], 200);
+        }
+
     }
 
     /**

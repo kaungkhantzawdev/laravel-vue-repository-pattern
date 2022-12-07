@@ -19,5 +19,7 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::prefix('v1')->group(function(){
-    Route::apiResource('/', \App\Http\Controllers\BlogController::class);
+    Route::get('/', [\App\Http\Controllers\BlogController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\BlogController::class, 'store']);
+    Route::get('/{slug}', [\App\Http\Controllers\BlogController::class, 'show']);
 });

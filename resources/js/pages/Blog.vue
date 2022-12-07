@@ -19,8 +19,8 @@
                         <div class="col" v-for="item in data" :key="item.id">
                             <div class="card border-0 shadow-sm">
                                 <div  v-if="item && item.photos != ''">
-                                    <div v-for="photo in item.photos">
-                                        <img v-if="photo.file_type == 101" :src="'storage/images/'+photo.name" alt="img" class=" card-img-top">
+                                    <div v-for="photo in item.photos" :key="photo.id">
+                                        <img v-if="photo.file_type == 101" :src="'/storage/images/'+photo.name" alt="img" class=" card-img-top">
                                     </div>
                                 </div>
                                 <img v-else src="https://images.pexels.com/photos/3658809/pexels-photo-3658809.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" alt="img" class=" card-img-top">
@@ -37,7 +37,7 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary">Edit</button>
                                         </div>
                                         <small class="text-muted">
-                                            <a href="" class="">view</a>
+                                            <RouterLink :to="'show/'+ item.slug" class="">view</RouterLink>
                                         </small>
                                     </div>
                                 </div>
