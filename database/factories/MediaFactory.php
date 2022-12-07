@@ -18,8 +18,8 @@ class MediaFactory extends Factory
     public function definition()
     {
         return [
-            "name" => "default",
-            "file_path" => "https://images.pexels.com/photos/2099266/pexels-photo-2099266.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "name" => "blueprint.png",
+            "file_path" => "_",
             "blog_id" => rand(1,100)
         ];
     }

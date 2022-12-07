@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->text('name');
-            $table->text('file_path');
+            $table->text('file_type');
             $table->foreignId('blog_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });

@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Models\Blog;
+use App\Repositories\BlogRepositoryInterface;
 
 class BlogController extends Controller
 {
+    private $blogRepository;
+
+    public function __construct(BlogRepositoryInterface $blogRepository)
+    {
+        $this->blogRepository = $blogRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +23,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::latest('id')->get();
+        $blogs = $this->blogRepository->all();
         return response()->json($blogs, 200);
     }
 
@@ -26,7 +34,7 @@ class BlogController extends Controller
      */
     public function create()
     {
-
+        return abort(404);
     }
 
     /**
@@ -37,7 +45,19 @@ class BlogController extends Controller
      */
     public function store(StoreBlogRequest $request)
     {
-        //
+        $request->validate([
+            'title'=>'required|min:3|max:50',
+            'description'=>'required',
+            'image'=>'required|file|mimes:jpg,png,jpeg|max:2000',
+            'photos' => 'required'
+        ]);
+
+        $this->blogRepository->store($request);
+
+        return response()->json([
+            'status' => 200,
+            'message' => "Successfully Added"
+        ], 200);
     }
 
     /**

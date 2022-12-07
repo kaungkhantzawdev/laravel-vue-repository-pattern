@@ -32,11 +32,11 @@
 
                                 <div class="col-md-6">
                                     <label for="fe">Featured Photo</label>
-                                    <input type="file"  id="fe" class="form-control">
+                                    <input type="file" @change="Featured" id="fe" class="form-control">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="re">Related photos</label>
-                                    <input type="file" id="re" class="form-control" multiple>
+                                    <input type="file" @change="Related" id="re" class="form-control" multiple>
                                 </div>
 
                             </div>
@@ -44,7 +44,7 @@
 
                             <hr class="my-4">
 
-                            <button class="w-100 btn btn-primary btn-lg" type="submit">create</button>
+                            <button class="w-100 btn btn-primary btn-lg" @click.prevent="Create">create</button>
                         </form>
                     </div>
                 </div>
@@ -59,13 +59,55 @@
 <script setup>
 import Layout from '../layouts/default.vue'
 import {ref} from "vue";
+import axios from "axios";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
+
+// text data
 const createData = ref({
     title: '',
     description: '',
-    image: '',
-    photos: ''
 });
 
-console.log(createData)
+// featuredPhoto
+const featuredPhoto = ref();
+const Featured = (e) => {
+    console.log(e.target.files[0])
+    if(e.target){
+        for (let img of e.target.files){
+            featuredPhoto.value = img
+        }
+    }
+}
+
+// relatedPhotos
+const relatedPhotos = ref([])
+const Related = (e) => {
+    // console.log(e.target.files)
+    for(let photo of e.target.files){
+        relatedPhotos.value.push(photo)
+    }
+    console.log(relatedPhotos.value.length)
+}
+
+//create
+const Create = async () => {
+    let formData = new FormData()
+    formData.append('title', createData.value.title)
+    formData.append('description', createData.value.description)
+    formData.append('image', featuredPhoto.value)
+
+    for(let i=0; i<relatedPhotos.value.length; i++){
+        formData.append('photos[]', relatedPhotos.value[i])
+    }
+    // console.log(formData)
+    await axios.post('/api/v1', formData)
+        .then(res => {
+            console.log('success',res)
+            router.push('/')
+        })
+        .catch(err => console.log('error', err))
+
+}
 </script>
