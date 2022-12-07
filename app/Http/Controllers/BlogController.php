@@ -141,8 +141,21 @@ class BlogController extends Controller
      * @param  \App\Models\Blog  $blog
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Blog $blog)
+    public function destroy($id)
     {
-        //
+        $blog = Blog::find($id);
+        if(is_null($blog)){
+            return response()->json([
+                'status' => 404,
+                'message' => "not found"
+            ], 404);
+        }else{
+            $blog->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => "successfully deleted",
+                'data' => $blog
+            ], 200);
+        }
     }
 }

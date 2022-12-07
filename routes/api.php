@@ -22,4 +22,5 @@ Route::prefix('v1')->group(function(){
     Route::get('/', [\App\Http\Controllers\BlogController::class, 'index']);
     Route::post('/', [\App\Http\Controllers\BlogController::class, 'store']);
     Route::get('/{slug}', [\App\Http\Controllers\BlogController::class, 'show']);
+    Route::delete('/{id}', [\App\Http\Controllers\BlogController::class, 'destroy']);
 });

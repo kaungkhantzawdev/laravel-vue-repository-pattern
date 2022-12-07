@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import 'bootstrap';
 import Blog from '../pages/Blog.vue';
 import NotFound from '../NotFound.vue';
 import Create from '../pages/Create.vue';
