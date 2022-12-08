@@ -31,11 +31,11 @@
 
 
                                 <div class="col-md-6">
-                                    <label for="fe">Featured Photo</label>
+                                    <label for="fe" class="form-label">Featured Photo</label>
                                     <input type="file" @change="Featured" id="fe" class="form-control">
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="re">Related photos</label>
+                                    <label for="re" class="form-label">Related photos</label>
                                     <input type="file" @change="Related" id="re" class="form-control" multiple>
                                 </div>
 

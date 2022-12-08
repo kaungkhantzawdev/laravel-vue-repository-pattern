@@ -18,9 +18,14 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-Route::prefix('v1')->group(function(){
-    Route::get('/', [\App\Http\Controllers\BlogController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\BlogController::class, 'store']);
-    Route::get('/{slug}', [\App\Http\Controllers\BlogController::class, 'show']);
-    Route::delete('/{id}', [\App\Http\Controllers\BlogController::class, 'destroy']);
+Route::prefix('v1')->controller(\App\Http\Controllers\BlogController::class)->group(function(){
+
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{slug}', 'show');
+    Route::delete('/{id}', 'destroy');
+    Route::delete('/photo-delete/{id}', 'deletePhoto');
+    Route::put('/{id}', 'update');
+//    Route::apiResource('/', \App\Http\Controllers\BlogController::class);
+
 });

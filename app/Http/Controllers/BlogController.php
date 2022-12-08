@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateBlogRequest;
 use App\Models\Blog;
 use App\Models\Media;
 use App\Repositories\BlogRepositoryInterface;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -37,12 +38,6 @@ class BlogController extends Controller
      */
     public function store(StoreBlogRequest $request)
     {
-        $request->validate([
-            'title'=>'required|min:3|max:50',
-            'description'=>'required',
-            'image'=>'required|file|mimes:jpg,png,jpeg|max:2000',
-            'photos' => 'required'
-        ]);
 
         $blog = Blog::create([
             'title'=> $request->title,
@@ -56,7 +51,7 @@ class BlogController extends Controller
             $file= $request->file('image');
             $filename= uniqid().'_image'.$file->getClientOriginalName();
             $dir = "public/images";
-            $file_path =$file-> storeAs( $dir , $filename);
+            $file-> storeAs( $dir , $filename);
 
             $image = Media::create([
                 'name' => $filename,
@@ -113,26 +108,59 @@ class BlogController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Blog  $blog
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Blog $blog)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateBlogRequest  $request
-     * @param  \App\Models\Blog  $blog
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateBlogRequest $request, Blog $blog)
+    public function update(UpdateBlogRequest $request, $id)
     {
-        //
+        $blog = Blog::find($id);
+        if($request->has('title')){
+            $blog->title = $request->title;
+            $blog->slug = Str::slug($request->title, '-');
+        }
+        if($request->has('description')){
+            $blog->description = $request->description;
+            $blog->excerpt = Str::limit($request->description,100, ' ...');
+        }
+
+        $blog->save();
+        //onePhoto
+        if($request->file('image')){
+            $file= $request->file('image');
+            $filename= uniqid().'_image'.$file->getClientOriginalName();
+            $dir = "public/images";
+            $file-> storeAs( $dir , $filename);
+
+            $image = Media::create([
+                'name' => $filename,
+                'file_type' => 101,
+                'blog_id' => $blog->id
+            ]);
+        }
+
+        //multiplePhoto
+        if($request->file('photos')){
+            foreach ($request->file('photos') as $photo){
+                $file= $photo;
+                $filename= uniqid().'_related_photo'.$photo->getClientOriginalName();
+                $dir = "public/related_photos";
+                $file-> storeAs( $dir , $filename);
+
+                $related_photos = Media::create([
+                    'name' => $filename,
+                    'file_type' => 102,
+                    'blog_id' => $blog->id
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => "Successfully Added",
+            'data' => $blog
+        ], 200);
     }
 
     /**
@@ -149,13 +177,56 @@ class BlogController extends Controller
                 'status' => 404,
                 'message' => "not found"
             ], 404);
-        }else{
-            $blog->delete();
-            return response()->json([
-                'status' => 200,
-                'message' => "successfully deleted",
-                'data' => $blog
-            ], 200);
         }
+
+        $media = Media::where('blog_id', $id )->get();
+        if($media){
+            foreach ($media as $m){
+                if($m->file_type == 101){
+                    $dir = "public/images/";
+                    Storage::delete($dir.$m->name);
+
+                }
+
+                if($m->file_type == 102){
+                    $dir = "public/related_photos/";
+                    Storage::delete($dir.$m->name);
+                }
+                $m->delete();
+            }
+        }
+
+        $blog->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => "successfully deleted",
+            'data' => $blog
+        ], 200);
+
+    }
+
+    public function deletePhoto($id) {
+        $media = Media::find($id);
+        if(!$media){
+            return response()->json([
+                'status' => 404,
+                'message' => "not found"
+            ], 404);
+        }
+        if($media->file_type == 101){
+            $dir = "public/images/";
+            Storage::delete($dir.$media->name);
+        }
+
+        if($media->file_type == 102){
+            $dir = "public/related_photos/";
+            Storage::delete($dir.$media->name);
+        }
+
+        $media->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => "successfully deleted",
+        ], 200);
     }
 }

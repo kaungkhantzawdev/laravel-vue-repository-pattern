@@ -23,7 +23,6 @@
                                         <img v-if="photo.file_type == 101" :src="'/storage/images/'+photo.name" alt="img" class=" card-img-top">
                                     </div>
                                 </div>
-                                <img v-else src="https://images.pexels.com/photos/3658809/pexels-photo-3658809.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" alt="img" class=" card-img-top">
                                 <div class="card-body">
                                     <h5 class="card-title">
                                         {{ item.title }}
@@ -34,7 +33,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-outline-danger" @click.prevent="DeleteClick( item )" data-bs-toggle="modal" data-bs-target="#modalId">Delete</button>
-                                            <button type="button" class="btn btn-sm btn-outline-primary">Edit</button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" @click.prevent="updateClick( item )" data-bs-toggle="modal" data-bs-target="#updateModal">Edit</button>
                                         </div>
                                         <small class="text-muted">
                                             <RouterLink :to="'show/'+ item.slug" class="">view</RouterLink>
@@ -50,8 +49,8 @@
 
 
             <!-- Modal -->
-
             <DeleteModal v-if="deleteData" :blog="deleteData"></DeleteModal>
+            <UpdateModal v-if="updateData" ></UpdateModal>
         </main>
     </Layout>
 </template>
@@ -63,8 +62,11 @@ import {onMounted, ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
 import {useData} from "../store/useData";
+import UpdateModal from "../components/UpdateModal.vue";
+import {useUpdate} from "../store/useUpdate";
 const router = useRouter();
 const storeData = useData();
+const storeUpdate = useUpdate();
 
 const createBlog = () => {
     return router.push('/create-blog')
@@ -86,5 +88,16 @@ const deleteData = ref({
 });
 const DeleteClick = (data) => {
     deleteData.value = data
+}
+
+//for update
+const updateData = ref({
+    title: 'HELLO',
+    description: 'Thank you'
+});
+const updateClick = (data) => {
+    updateData.value = data
+    storeUpdate.addBlog(data)
+    storeUpdate.addPhotos(data.photos)
 }
 </script>
