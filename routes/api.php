@@ -26,6 +26,7 @@ Route::prefix('v1')->controller(\App\Http\Controllers\BlogController::class)->gr
     Route::delete('/{id}', 'destroy');
     Route::delete('/photo-delete/{id}', 'deletePhoto');
     Route::put('/{id}', 'update');
+    Route::post('/{id}', 'addPhotos');
 //    Route::apiResource('/', \App\Http\Controllers\BlogController::class);
 
 });

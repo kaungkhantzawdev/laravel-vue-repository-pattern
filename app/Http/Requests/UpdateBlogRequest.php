@@ -24,8 +24,8 @@ class UpdateBlogRequest extends FormRequest
     public function rules()
     {
         return [
-//            'title'=>'min:3|max:50',
-//            'image'=>'file|mimes:jpg,png,jpeg|max:2000',
+            'title'=>'min:3|max:50',
+            'description'=>'max:800',
         ];
     }
 }

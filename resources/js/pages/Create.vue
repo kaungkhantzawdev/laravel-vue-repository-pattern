@@ -10,33 +10,32 @@
 
                 <div class="row g-5 justify-content-center">
                     <div class="col-12 col-md-7 col-lg-8">
+                        <div v-if="errorShow">
+                            <p v-for="(error,id) in errorMessage" :key="id" class="alert alert-danger py-2">
+                                <span v-for="e in error" :key="e">{{ e }}</span>
+                            </p>
+                        </div>
                         <form class="needs-validation" enctype="multipart/form-data">
                             <div class="row g-3">
 
                                 <div class="col-12">
                                     <label for="username" class="form-label">Blog Title</label>
                                     <input type="text" v-model="createData.title" class="form-control" id="username" placeholder="title" required>
-                                    <div class="invalid-feedback">
-                                        Your username is required.
-                                    </div>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="desc" class="form-label">Description</label>
-                                    <textarea v-model="createData.description" id="desc" class="form-control" cols="30" rows="5" placeholder="write blog"></textarea>
-                                    <div class="invalid-feedback">
-                                        Please enter a valid email address for shipping updates.
-                                    </div>
+                                    <textarea v-model="createData.description" id="desc" class="form-control" cols="30" rows="5" placeholder="write blog" required></textarea>
                                 </div>
 
 
                                 <div class="col-md-6">
                                     <label for="fe" class="form-label">Featured Photo</label>
-                                    <input type="file" @change="Featured" id="fe" class="form-control">
+                                    <input type="file" @change="Featured" id="fe" accept="image/png, image/jpeg, image/png" class="form-control" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="re" class="form-label">Related photos</label>
-                                    <input type="file" @change="Related" id="re" class="form-control" multiple>
+                                    <input type="file" @change="Related" id="re" accept="image/png, image/jpeg, image/png" class="form-control" multiple>
                                 </div>
 
                             </div>
@@ -107,7 +106,15 @@ const Create = async () => {
             console.log('success',res)
             router.push('/')
         })
-        .catch(err => console.log('error', err))
+        .catch(err => {
+            console.log('error', err.response.data.errors)
+            errorShow.value = true
+            errorMessage.value = err.response.data.errors
+        })
 
 }
+
+// for error message
+const errorMessage = ref();
+const errorShow = ref(false)
 </script>

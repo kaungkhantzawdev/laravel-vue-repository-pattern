@@ -25,9 +25,9 @@ class StoreBlogRequest extends FormRequest
     {
         return [
             'title'=>'required|min:3|max:50',
-            'description'=>'required',
-            'image'=>'required|file|mimes:jpg,png,jpeg|max:2000',
-            'photos' => 'required'
+            'description'=>'required|max:800',
+            'image'=>'required|file|mimes:jpg,png,jpeg|max:2048',
+//            'photos'=>'mimes:jpg,png,jpeg|max:2048',
         ];
     }
 }
